@@ -15,7 +15,9 @@ import {
   Linking,
   Alert,
   TextInput,
-  FlatList
+  FlatList,
+  Picker,
+  Item
 } from 'react-native';
 import Player, {MyLyric, MyPlayerBar} from '../player/Player';
 import ReLoadSong from '../components/MyPlayerBar';
@@ -32,7 +34,10 @@ import {
   setIndexPlayingInList,
 } from '../redux/action';
 import {FirebaseApp} from '../components/FirebaseConfig.js';
+import RNFetchBlob from 'rn-fetch-blob';
+
 const screenWidth = Math.round(Dimensions.get('window').width);
+
 class StreamScreen extends Component {
   constructor(props) {
     super(props);
@@ -49,12 +54,14 @@ class StreamScreen extends Component {
       dataCmt: [],
       valueCmt: '',
       popUpClock: false,
+      popUpChooseTheme:false,
       clock_On: false,
       timerValue: 0,
       popUpSpeed: false,
       speedValue: 1,
       typeLoop: 0,
       typeNext: 0,
+      theme: 0,
     };
   }
   static navigationOptions = {
@@ -161,11 +168,41 @@ class StreamScreen extends Component {
     //   console.log(this.state.dataCmt['-LwdBMd51a0j-yf0cMTU'].name)
     // });
   }
+
+  _loadTheme(){
+
+    var fs = RNFetchBlob.fs;
+    var path = RNFetchBlob.fs.dirs.SDCardDir + '/DataLocal/theme';
+    RNFetchBlob.fs.exists(path).then(value => {
+      if (!value) {
+        fs.mkdir(path)
+          .then(() => {
+            fs.createFile(
+              path + '/theme.txt',
+              '1',
+              'utf8',
+            );            
+          });
+      }
+      else{
+        fs.readFile(path + '/theme.txt', 'utf8').then(value=>{
+          this.setState({theme:value});          
+        });
+      }
+    });
+  }
+  _setTheme(value){
+    var fs = RNFetchBlob.fs;
+    var path = RNFetchBlob.fs.dirs.SDCardDir + '/DataLocal/theme/theme.txt';
+    fs.writeFile(path, value+'', "utf8")
+    console.log('set thêm ' + value);
+  }
   componentDidMount() {
     //this._loadDataCmt()
     //this._loadDataCmt(this.props.myCurrentSong.id);
+    this._loadTheme();
   }
-
+  
   static _on = false;
   ShowAlertWithDelay = () => {
     setTimeout(function() {
@@ -259,7 +296,14 @@ class StreamScreen extends Component {
   //     }
   // }
 
+  updateTheme = (theme) => {
+    this.setState({ theme: theme });
+    this._setTheme(theme);
+  }
   render() {
+    if(this.state.theme==0){
+      this._loadTheme();
+    }
     if (StreamScreen._on == true) {
       this.setState({clock_On: false, timerValue: 0});
       this.props.setPause();
@@ -267,7 +311,17 @@ class StreamScreen extends Component {
     }
     return (
       <ImageBackground
-        source={require('../../res/BGStream1.jpg')}
+        source={this.state.theme == 1 ? require('../../res/BGStream1.jpg') : 
+          (this.state.theme == 2 ? require('../../res/BG2.jpg'):
+            (this.state.theme == 3 ? require('../../res/BG3.jpg'):
+              (this.state.theme == 4 ? require('../../res/BG4.jpg'):
+                (this.state.theme == 5 ? require('../../res/BG5.jpg'):
+                  (this.state.theme == 6 ? require('../../res/BG6.jpg') : 
+                    (this.state.theme == 7 ? require('../../res/BG7.jpg') : 
+                      (this.state.theme == 8 ? require('../../res/BG8.jpg') : 
+                        (this.state.theme == 9 ? require('../../res/BG9.jpg') : 
+                          (this.state.theme == 10 ? require('../../res/BG10.jpg') : require('../../res/BGStream1.jpg'))))))))))
+        }
         style={{width: '100%', height: '100%'}}>
         <View style={[styles.container, {backgroundColor: 'transparent'}]}>
           <View style={[styles.con2, {position: 'relative'}]}>
@@ -278,6 +332,21 @@ class StreamScreen extends Component {
                 zIndex: 9,
                 flexDirection: 'row',
               }}>
+              <View style={{ justifyContent: 'center', marginLeft: 5, marginRight: 5 }}>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    this.setState({ popUpChooseTheme: !this.state.popUpChooseTheme });
+                  }}>
+                  <Image
+                    style={{
+                      width: 20,
+                      height: 30,
+                      resizeMode: 'center',
+                    }}
+                    source={require('../../res/threeDot.png')}></Image>
+                </TouchableOpacity>
+              </View>
               <View style={[styles.con2, {position: 'relative'}]}>
                 <Text
                   style={{
@@ -299,14 +368,15 @@ class StreamScreen extends Component {
                   - {this.props.myCurrentSong.artists_names} -
                 </Text>
               </View>
-
-              <View style={{justifyContent: 'center', marginLeft: 5}}>
-                <TouchableOpacity
-                  onPress={() => {
-                    this.setState({popUpClock: !this.state.popUpClock});
-                  }}>
-                  <Icon_ name="clock" size={20} color={'#fff'}></Icon_>
-                </TouchableOpacity>
+              
+              <View style={{justifyContent: 'center', marginLeft: 5,marginRight:10}}>
+                
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.setState({ popUpClock: !this.state.popUpClock });
+                    }}>
+                    <Icon_ name="clock" size={20} color={'#fff'}></Icon_>
+                  </TouchableOpacity>
               </View>
             </View>
 
@@ -661,6 +731,48 @@ class StreamScreen extends Component {
               </View>
             </View>
           </Modal>
+
+          <Modal
+            visible={this.state.popUpChooseTheme}
+            transparent={true}
+            animationType="slide"
+            style={{ alignItems: 'center' }}
+            onBackdropPress={() => {
+              this.setState({ popUpChooseTheme: false });
+            }}>
+            <View
+              style={{
+                padding: 20,
+                borderRadius: 20,
+                // marginTop: -50,
+                height: 200,
+                width: 200,
+                backgroundColor: '#fffffffa',
+                alignItems: 'center',
+                //justifyContent: 'center',
+              }}>
+              <Button title={'Chọn hình nền'}></Button>
+              <Text></Text>
+
+              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <Picker style={{ height: 50, width: 150 }} mode='dropdown'
+                  selectedValue={this.state.theme} onValueChange={this.updateTheme}>
+                  
+                  <Picker.Item label="Hình nền 1" value={1} />
+                  <Picker.Item label="Hình nền 2" value={2} />
+                  <Picker.Item label="Hình nền 3" value={3} />
+                  <Picker.Item label="Hình nền 4" value={4} />
+                  <Picker.Item label="Hình nền 5" value={5} />
+                  <Picker.Item label="Hình nền 6" value={6} />
+                  <Picker.Item label="Hình nền 7" value={7} />
+                  <Picker.Item label="Hình nền 8" value={8} />
+                  <Picker.Item label="Hình nền 9" value={9} />
+                  <Picker.Item label="Hình nền 10" value={10} />
+                </Picker>
+              </View>
+            </View>
+          </Modal>
+
 
           <Modal
             visible={this.state.popUpSpeed}

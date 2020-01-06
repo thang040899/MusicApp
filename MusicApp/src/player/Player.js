@@ -457,31 +457,42 @@ export class MyLyric extends TrackPlayer.ProgressComponent {
     {
       this.setState({link:this.props.linkLyric})
       
-    console.log("set linK liric "+this.props.linkLyric.substring(0,4))
-    if(this.props.linkLyric.substring(0,4)=='http')
-    {
-      fetch(this.props.linkLyric)
-      .then(response => {
-        return response.text();
-      })
-      .then(res => {
-  
-       this.setState({stringLyric: res});
-       this.xuLiLyric(this.state.stringLyric)
-  
-      }); 
-    }
-    else
-    {
-      RNFetchBlob.fs.readFile(this.props.linkLyric,'utf8').then((data)=>{
-        this.setState({stringLyric: data});
+      console.log('LYRC: ='+this.props.linkLyric+'=');
+      if (this.props.linkLyric == '' || (this.props.linkLyric + '').includes('lrc-nct')){
+        console.log("lyrc k co nha! ..............");
+        this.setState({ stringLyric: '' });
+        this.xuLiLyric(this.state.stringLyric);
+      }
+        
+      else if(this.props.linkLyric.substring(0,4)=='http')
+      {
+        fetch(this.props.linkLyric)
+        .then(response => {
+          return response.text();
+        })
+        .then(res => {
+    
+        this.setState({stringLyric: res});
         this.xuLiLyric(this.state.stringLyric)
-      })
-    }
+    
+        }); 
+      }
+      else
+      {
+        RNFetchBlob.fs.readFile(this.props.linkLyric,'utf8').then((data)=>{
+          this.setState({stringLyric: data});
+          this.xuLiLyric(this.state.stringLyric)
+        })
+      }
     }
 
     //console.log(this.state.curentTime);
     let i=0;
+    if (this.props.linkLyric == '' || (this.props.linkLyric + '').includes('lrc-nct')) {
+      return(
+        <View></View>
+      );
+    }else
     return (
       <View style={styles.container}>
         {/*<TouchableOpacity  onPress={()=>{this._showLyric(),this._renderText('hahaah')}}> 

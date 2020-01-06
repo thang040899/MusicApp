@@ -281,10 +281,10 @@ _loadDataBHVuaNghe()
     var temp=[],
     temp=JSON.parse(data)
     this.props.setDataBHVuaNghe(temp)
+    
   })
 }
   render() {
-
     return (
       <ImageBackground
         source={require('../../res/BG2.jpg')} style={{ flex: 1, backgroundColor:'#48dbfb'}}>

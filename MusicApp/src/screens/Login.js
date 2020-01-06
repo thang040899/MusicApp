@@ -78,6 +78,12 @@ export default class LoginScreen extends Component {
         fs.mkdir(path)
           .then(() => {
             fs.createFile(path+'/p.txt','',"utf8")
+            let objTheme = { currentTheme: 1};
+            fs.createFile(
+              path + '/theme.txt',
+              JSON.stringify(objTheme),
+              'utf8',
+            );
             fs.mkdir(path + '/PlayList_Local');
             fs.mkdir(path + '/BaiHatVuaNghe');
             fs.mkdir(path + '/Music_Local').then(() => {

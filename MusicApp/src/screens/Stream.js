@@ -15,7 +15,9 @@ import {
   Linking,
   Alert,
   TextInput,
-  FlatList
+  FlatList,
+  Picker,
+  Item,
 } from 'react-native';
 import Player, {MyLyric, MyPlayerBar} from '../player/Player';
 import ReLoadSong from '../components/MyPlayerBar';
@@ -32,7 +34,10 @@ import {
   setIndexPlayingInList,
 } from '../redux/action';
 import {FirebaseApp} from '../components/FirebaseConfig.js';
+import RNFetchBlob from 'rn-fetch-blob';
+
 const screenWidth = Math.round(Dimensions.get('window').width);
+
 class StreamScreen extends Component {
   constructor(props) {
     super(props);
@@ -49,12 +54,14 @@ class StreamScreen extends Component {
       dataCmt: [],
       valueCmt: '',
       popUpClock: false,
+      popUpChooseTheme: false,
       clock_On: false,
       timerValue: 0,
       popUpSpeed: false,
       speedValue: 1,
       typeLoop: 0,
       typeNext: 0,
+      theme: 0,
     };
   }
   static navigationOptions = {
@@ -134,26 +141,25 @@ class StreamScreen extends Component {
     }
 
     for (let i = 0; i < items.length; i++) {
-      
-        FirebaseApp.storage()
-          .ref('/images/' + items[i].uid + '.jpg')
-          .getDownloadURL().catch(function(error){})
-          .then(URL => {
-            //var t = dataSnapshot.toJSON();           
-            if (URL == null) {
-              items[i].image = null;
-              //console.log(url);
-            } else {
-              items[i].image = URL;
-            }
+      FirebaseApp.storage()
+        .ref('/images/' + items[i].uid + '.jpg')
+        .getDownloadURL()
+        .catch(function(error) {})
+        .then(URL => {
+          //var t = dataSnapshot.toJSON();
+          if (URL == null) {
+            items[i].image = null;
+            //console.log(url);
+          } else {
+            items[i].image = URL;
+          }
 
-            // items.push(t);
-            //console.log(items);
-          })
-          .then(() => {
-            this.setState({dataCmt: items});
-          })
-      
+          // items.push(t);
+          //console.log(items);
+        })
+        .then(() => {
+          this.setState({dataCmt: items});
+        });
     }
 
     // .then((data)=>{
@@ -161,9 +167,32 @@ class StreamScreen extends Component {
     //   console.log(this.state.dataCmt['-LwdBMd51a0j-yf0cMTU'].name)
     // });
   }
+
+  _loadTheme() {
+    var fs = RNFetchBlob.fs;
+    var path = RNFetchBlob.fs.dirs.SDCardDir + '/DataLocal/theme';
+    RNFetchBlob.fs.exists(path).then(value => {
+      if (!value) {
+        fs.mkdir(path).then(() => {
+          fs.createFile(path + '/theme.txt', '1', 'utf8');
+        });
+      } else {
+        fs.readFile(path + '/theme.txt', 'utf8').then(value => {
+          this.setState({theme: value});
+        });
+      }
+    });
+  }
+  _setTheme(value) {
+    var fs = RNFetchBlob.fs;
+    var path = RNFetchBlob.fs.dirs.SDCardDir + '/DataLocal/theme/theme.txt';
+    fs.writeFile(path, value + '', 'utf8');
+    console.log('set thêm ' + value);
+  }
   componentDidMount() {
     //this._loadDataCmt()
     //this._loadDataCmt(this.props.myCurrentSong.id);
+    this._loadTheme();
   }
 
   static _on = false;
@@ -259,7 +288,15 @@ class StreamScreen extends Component {
   //     }
   // }
 
+  updateTheme = theme => {
+    this.setState({theme: theme});
+    this._setTheme(theme);
+  };
   render() {
+    var data = [1, 2, 3, 4, 5];
+    if (this.state.theme == 0) {
+      this._loadTheme();
+    }
     if (StreamScreen._on == true) {
       this.setState({clock_On: false, timerValue: 0});
       this.props.setPause();
@@ -267,7 +304,29 @@ class StreamScreen extends Component {
     }
     return (
       <ImageBackground
-        source={require('../../res/BGStream1.jpg')}
+        source={
+          this.state.theme == 1
+            ? require('../../res/BGStream1.jpg')
+            : this.state.theme == 2
+            ? require('../../res/BG2.jpg')
+            : this.state.theme == 3
+            ? require('../../res/BG3.jpg')
+            : this.state.theme == 4
+            ? require('../../res/BG4.jpg')
+            : this.state.theme == 5
+            ? require('../../res/BG5.jpg')
+            : this.state.theme == 6
+            ? require('../../res/BG6.jpg')
+            : this.state.theme == 7
+            ? require('../../res/BG7.jpg')
+            : this.state.theme == 8
+            ? require('../../res/BG8.jpg')
+            : this.state.theme == 9
+            ? require('../../res/BG9.jpg')
+            : this.state.theme == 10
+            ? require('../../res/BG10.jpg')
+            : require('../../res/BGStream1.jpg')
+        }
         style={{width: '100%', height: '100%'}}>
         <View style={[styles.container, {backgroundColor: 'transparent'}]}>
           <View style={[styles.con2, {position: 'relative'}]}>
@@ -278,6 +337,27 @@ class StreamScreen extends Component {
                 zIndex: 9,
                 flexDirection: 'row',
               }}>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  marginLeft: 5,
+                  marginRight: 5,
+                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.setState({
+                      popUpChooseTheme: !this.state.popUpChooseTheme,
+                    });
+                  }}>
+                  <Image
+                    style={{
+                      width: 20,
+                      height: 30,
+                      resizeMode: 'center',
+                    }}
+                    source={require('../../res/threeDot.png')}></Image>
+                </TouchableOpacity>
+              </View>
               <View style={[styles.con2, {position: 'relative'}]}>
                 <Text
                   style={{
@@ -300,7 +380,12 @@ class StreamScreen extends Component {
                 </Text>
               </View>
 
-              <View style={{justifyContent: 'center', marginLeft: 5}}>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  marginLeft: 5,
+                  marginRight: 10,
+                }}>
                 <TouchableOpacity
                   onPress={() => {
                     this.setState({popUpClock: !this.state.popUpClock});
@@ -659,6 +744,119 @@ class StreamScreen extends Component {
                   }}></Switch>
                 {/* <Text>Báo thức đang: {this.state.clock_On==false? 'Tắt':"Bật"} </Text> */}
               </View>
+            </View>
+          </Modal>
+
+          <Modal
+            visible={this.state.popUpChooseTheme}
+            transparent={true}
+            animationType="slide"
+            style={{alignItems: 'center'}}
+            onBackdropPress={() => {
+              this.setState({popUpChooseTheme: false});
+            }}>
+            <View
+              style={{
+                padding: 20,
+                borderRadius: 20,
+                // marginTop: -50,
+                height: 350,
+                width: 280,
+                backgroundColor: '#fffffffa',
+                // alignItems: 'center',
+                //justifyContent: 'center',
+              }}>
+              <Button title={'Chọn hình nền'}></Button>
+              <Text></Text>
+
+              <FlatList
+                data={data}
+                horizontal={true}
+                renderItem={({item, index}) => (
+                  <View style={{flex: 1, margin: 10}}>
+                    <TouchableOpacity onPress={()=>{this.setState({theme:item}) ;this.updateTheme(item)}}>
+                      <Image
+                        style={{width: 100, height: 150}}
+                        resizeMode="stretch"
+                        source={
+                          item == 1
+                            ? require('../../res/BGStream1.jpg')
+                            : item == 2
+                            ? require('../../res/BG2.jpg')
+                            : item == 3
+                            ? require('../../res/BG3.jpg')
+                            : item == 4
+                            ? require('../../res/BG4.jpg')
+                            : item == 5
+                            ? require('../../res/BG5.jpg')
+                            : item == 6
+                            ? require('../../res/BG6.jpg')
+                            : item == 7
+                            ? require('../../res/BG7.jpg')
+                            : item == 8
+                            ? require('../../res/BG8.jpg')
+                            : item == 9
+                            ? require('../../res/BG9.jpg')
+                            : item == 10
+                            ? require('../../res/BG10.jpg')
+                            : require('../../res/BGStream1.jpg')
+                        }></Image>
+                    </TouchableOpacity>
+                  </View>
+                )}></FlatList>
+
+              <FlatList
+                data={data}
+                horizontal={true}
+                renderItem={({item, index}) => (
+                  <View style={{flex: 1, margin: 10}}>
+                    <TouchableOpacity onPress={()=>{{this.setState({theme:item+5})} ;this.updateTheme(item+5)}}>
+                      <Image
+                        style={{width: 100, height: 150}}
+                        resizeMode="stretch"
+                        source={
+                          item+5 == 1
+                            ? require('../../res/BGStream1.jpg')
+                            : item+5 == 2
+                            ? require('../../res/BG2.jpg')
+                            : item +5== 3
+                            ? require('../../res/BG3.jpg')
+                            : item+5 == 4
+                            ? require('../../res/BG4.jpg')
+                            : item+5 == 5
+                            ? require('../../res/BG5.jpg')
+                            : item+5 == 6
+                            ? require('../../res/BG6.jpg')
+                            : item+5 == 7
+                            ? require('../../res/BG7.jpg')
+                            : item+5 == 8
+                            ? require('../../res/BG8.jpg')
+                            : item+5 == 9
+                            ? require('../../res/BG9.jpg')
+                            : item+5 == 10
+                            ? require('../../res/BG10.jpg')
+                            : require('../../res/BGStream1.jpg')
+                        }
+                        ></Image>
+                    </TouchableOpacity>
+                  </View>
+                )}></FlatList>
+              {/* <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                <Picker style={{ height: 50, width: 150 }} mode='dropdown'
+                  selectedValue={this.state.theme} onValueChange={this.updateTheme}>
+                  
+                  <Picker.Item label="Hình nền 1" value={1} />
+                  <Picker.Item label="Hình nền 2" value={2} />
+                  <Picker.Item label="Hình nền 3" value={3} />
+                  <Picker.Item label="Hình nền 4" value={4} />
+                  <Picker.Item label="Hình nền 5" value={5} />
+                  <Picker.Item label="Hình nền 6" value={6} />
+                  <Picker.Item label="Hình nền 7" value={7} />
+                  <Picker.Item label="Hình nền 8" value={8} />
+                  <Picker.Item label="Hình nền 9" value={9} />
+                  <Picker.Item label="Hình nền 10" value={10} />
+                </Picker>
+              </View> */}
             </View>
           </Modal>
 

@@ -17,7 +17,11 @@ import {
   TextInput,
   FlatList,
   Picker,
+<<<<<<< HEAD
   Item,
+=======
+  Item
+>>>>>>> 7c60006f8aa34565cdd2e124ef1dbbffc7524e31
 } from 'react-native';
 import Player, {MyLyric, MyPlayerBar} from '../player/Player';
 import ReLoadSong from '../components/MyPlayerBar';
@@ -54,7 +58,11 @@ class StreamScreen extends Component {
       dataCmt: [],
       valueCmt: '',
       popUpClock: false,
+<<<<<<< HEAD
       popUpChooseTheme: false,
+=======
+      popUpChooseTheme:false,
+>>>>>>> 7c60006f8aa34565cdd2e124ef1dbbffc7524e31
       clock_On: false,
       timerValue: 0,
       popUpSpeed: false,
@@ -168,25 +176,52 @@ class StreamScreen extends Component {
     // });
   }
 
+<<<<<<< HEAD
   _loadTheme() {
+=======
+  _loadTheme(){
+
+>>>>>>> 7c60006f8aa34565cdd2e124ef1dbbffc7524e31
     var fs = RNFetchBlob.fs;
     var path = RNFetchBlob.fs.dirs.SDCardDir + '/DataLocal/theme';
     RNFetchBlob.fs.exists(path).then(value => {
       if (!value) {
+<<<<<<< HEAD
         fs.mkdir(path).then(() => {
           fs.createFile(path + '/theme.txt', '1', 'utf8');
         });
       } else {
         fs.readFile(path + '/theme.txt', 'utf8').then(value => {
           this.setState({theme: value});
+=======
+        fs.mkdir(path)
+          .then(() => {
+            fs.createFile(
+              path + '/theme.txt',
+              '1',
+              'utf8',
+            );            
+          });
+      }
+      else{
+        fs.readFile(path + '/theme.txt', 'utf8').then(value=>{
+          this.setState({theme:value});          
+>>>>>>> 7c60006f8aa34565cdd2e124ef1dbbffc7524e31
         });
       }
     });
   }
+<<<<<<< HEAD
   _setTheme(value) {
     var fs = RNFetchBlob.fs;
     var path = RNFetchBlob.fs.dirs.SDCardDir + '/DataLocal/theme/theme.txt';
     fs.writeFile(path, value + '', 'utf8');
+=======
+  _setTheme(value){
+    var fs = RNFetchBlob.fs;
+    var path = RNFetchBlob.fs.dirs.SDCardDir + '/DataLocal/theme/theme.txt';
+    fs.writeFile(path, value+'', "utf8")
+>>>>>>> 7c60006f8aa34565cdd2e124ef1dbbffc7524e31
     console.log('set thêm ' + value);
   }
   componentDidMount() {
@@ -194,7 +229,7 @@ class StreamScreen extends Component {
     //this._loadDataCmt(this.props.myCurrentSong.id);
     this._loadTheme();
   }
-
+  
   static _on = false;
   ShowAlertWithDelay = () => {
     setTimeout(function() {
@@ -288,6 +323,7 @@ class StreamScreen extends Component {
   //     }
   // }
 
+<<<<<<< HEAD
   updateTheme = theme => {
     this.setState({theme: theme});
     this._setTheme(theme);
@@ -295,6 +331,14 @@ class StreamScreen extends Component {
   render() {
     var data = [1, 2, 3, 4, 5];
     if (this.state.theme == 0) {
+=======
+  updateTheme = (theme) => {
+    this.setState({ theme: theme });
+    this._setTheme(theme);
+  }
+  render() {
+    if(this.state.theme==0){
+>>>>>>> 7c60006f8aa34565cdd2e124ef1dbbffc7524e31
       this._loadTheme();
     }
     if (StreamScreen._on == true) {
@@ -304,6 +348,7 @@ class StreamScreen extends Component {
     }
     return (
       <ImageBackground
+<<<<<<< HEAD
         source={
           this.state.theme == 1
             ? require('../../res/BGStream1.jpg')
@@ -326,6 +371,18 @@ class StreamScreen extends Component {
             : this.state.theme == 10
             ? require('../../res/BG10.jpg')
             : require('../../res/BGStream1.jpg')
+=======
+        source={this.state.theme == 1 ? require('../../res/BGStream1.jpg') : 
+          (this.state.theme == 2 ? require('../../res/BG2.jpg'):
+            (this.state.theme == 3 ? require('../../res/BG3.jpg'):
+              (this.state.theme == 4 ? require('../../res/BG4.jpg'):
+                (this.state.theme == 5 ? require('../../res/BG5.jpg'):
+                  (this.state.theme == 6 ? require('../../res/BG6.jpg') : 
+                    (this.state.theme == 7 ? require('../../res/BG7.jpg') : 
+                      (this.state.theme == 8 ? require('../../res/BG8.jpg') : 
+                        (this.state.theme == 9 ? require('../../res/BG9.jpg') : 
+                          (this.state.theme == 10 ? require('../../res/BG10.jpg') : require('../../res/BGStream1.jpg'))))))))))
+>>>>>>> 7c60006f8aa34565cdd2e124ef1dbbffc7524e31
         }
         style={{width: '100%', height: '100%'}}>
         <View style={[styles.container, {backgroundColor: 'transparent'}]}>
@@ -337,6 +394,7 @@ class StreamScreen extends Component {
                 zIndex: 9,
                 flexDirection: 'row',
               }}>
+<<<<<<< HEAD
               <View
                 style={{
                   justifyContent: 'center',
@@ -348,6 +406,13 @@ class StreamScreen extends Component {
                     this.setState({
                       popUpChooseTheme: !this.state.popUpChooseTheme,
                     });
+=======
+              <View style={{ justifyContent: 'center', marginLeft: 5, marginRight: 5 }}>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    this.setState({ popUpChooseTheme: !this.state.popUpChooseTheme });
+>>>>>>> 7c60006f8aa34565cdd2e124ef1dbbffc7524e31
                   }}>
                   <Image
                     style={{
@@ -379,6 +444,7 @@ class StreamScreen extends Component {
                   - {this.props.myCurrentSong.artists_names} -
                 </Text>
               </View>
+<<<<<<< HEAD
 
               <View
                 style={{
@@ -751,24 +817,38 @@ class StreamScreen extends Component {
             visible={this.state.popUpChooseTheme}
             transparent={true}
             animationType="slide"
+<<<<<<< HEAD
             style={{alignItems: 'center'}}
             onBackdropPress={() => {
               this.setState({popUpChooseTheme: false});
+=======
+            style={{ alignItems: 'center' }}
+            onBackdropPress={() => {
+              this.setState({ popUpChooseTheme: false });
+>>>>>>> 7c60006f8aa34565cdd2e124ef1dbbffc7524e31
             }}>
             <View
               style={{
                 padding: 20,
                 borderRadius: 20,
                 // marginTop: -50,
+<<<<<<< HEAD
                 height: 350,
                 width: 280,
                 backgroundColor: '#fffffffa',
                 // alignItems: 'center',
+=======
+                height: 200,
+                width: 200,
+                backgroundColor: '#fffffffa',
+                alignItems: 'center',
+>>>>>>> 7c60006f8aa34565cdd2e124ef1dbbffc7524e31
                 //justifyContent: 'center',
               }}>
               <Button title={'Chọn hình nền'}></Button>
               <Text></Text>
 
+<<<<<<< HEAD
               <FlatList
                 data={data}
                 horizontal={true}
@@ -842,6 +922,9 @@ class StreamScreen extends Component {
                   </View>
                 )}></FlatList>
               {/* <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+=======
+              <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+>>>>>>> 7c60006f8aa34565cdd2e124ef1dbbffc7524e31
                 <Picker style={{ height: 50, width: 150 }} mode='dropdown'
                   selectedValue={this.state.theme} onValueChange={this.updateTheme}>
                   
@@ -856,10 +939,18 @@ class StreamScreen extends Component {
                   <Picker.Item label="Hình nền 9" value={9} />
                   <Picker.Item label="Hình nền 10" value={10} />
                 </Picker>
+<<<<<<< HEAD
               </View> */}
             </View>
           </Modal>
 
+=======
+              </View>
+            </View>
+          </Modal>
+
+
+>>>>>>> 7c60006f8aa34565cdd2e124ef1dbbffc7524e31
           <Modal
             visible={this.state.popUpSpeed}
             transparent={true}

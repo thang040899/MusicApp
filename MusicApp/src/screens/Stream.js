@@ -458,6 +458,17 @@ class StreamScreen extends Component {
                   }}>
                   <Icon_ name="clock" size={20} color={'#fff'}></Icon_>
                 </TouchableOpacity>
+=======
+              
+              <View style={{justifyContent: 'center', marginLeft: 5,marginRight:10}}>
+                
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.setState({ popUpClock: !this.state.popUpClock });
+                    }}>
+                    <Icon_ name="clock" size={20} color={'#fff'}></Icon_>
+                  </TouchableOpacity>
+>>>>>>> 7c60006f8aa34565cdd2e124ef1dbbffc7524e31
               </View>
             </View>
 
